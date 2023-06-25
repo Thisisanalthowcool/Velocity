@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: velocity
+    env: node
+    buildCommand: npm i && npm run build
+    startCommand: npm start
