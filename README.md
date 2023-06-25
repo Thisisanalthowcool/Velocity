@@ -14,6 +14,15 @@
 
 The initial inspiration for Velocity came from other proxies such as Hypertabs and Rammerhead Browser. After using these proxies issues arose that broke the illusion of using a web browser which velocity attempts to fix.
 
+## Deploy
+
+<a target="_blank" href="https://heroku.com/deploy/?template=https://github.com/Thisisanalthowcool/Velocity/"><img alt="Deploy to Heroku" src="https://binbashbanana.github.io/deploy-buttons/buttons/remade/heroku.svg"></a>
+<a target="_blank" href="https://github.com/Thisisanalthowcool/Velocity/"><img alt="Run on Replit" src="https://binbashbanana.github.io/deploy-buttons/buttons/remade/replit.svg"></a>
+<a target="_blank" href="https://github.com/Thisisanalthowcool/Velocity/"><img alt="Deploy on Railway" src="https://binbashbanana.github.io/deploy-buttons/buttons/remade/railway.svg"></a>
+<a target="_blank" href="https://app.koyeb.com/deploy?type=git&repository=github.com/Thisisanalthowcool/Velociy&branch=main&name=Velocity"><img alt="Deploy to Koyeb" src="https://binbashbanana.github.io/deploy-buttons/buttons/remade/koyeb.svg"></a>
+<a target="_blank" href="https://github.com/Thisisanalthowcool/Velocity/"><img alt="Deploy to Render" src="https://binbashbanana.github.io/deploy-buttons/buttons/remade/render.svg"></a>
+<a target="_blank" href="https://app.cyclic.sh/api/app/deploy/Thisisanalthowcool/Velocity"><img alt="Deploy to Cyclic" src="https://binbashbanana.github.io/deploy-buttons/buttons/remade/cyclic.svg"></a>
+
 ## Features
 
 - Sleek Firefox inspired UI
