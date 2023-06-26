@@ -21,7 +21,6 @@ The initial inspiration for Velocity came from other proxies such as Hypertabs a
 <a target="_blank" href="https://github.com/Thisisanalthowcool/Velocity/"><img alt="Deploy on Railway" src="https://binbashbanana.github.io/deploy-buttons/buttons/remade/railway.svg"></a>
 <a target="_blank" href="https://app.koyeb.com/deploy?type=git&repository=github.com/Thisisanalthowcool/Velociy&branch=main&name=Velocity"><img alt="Deploy to Koyeb" src="https://binbashbanana.github.io/deploy-buttons/buttons/remade/koyeb.svg"></a>
 <a target="_blank" href="https://github.com/Thisisanalthowcool/Velocity/"><img alt="Deploy to Render" src="https://binbashbanana.github.io/deploy-buttons/buttons/remade/render.svg"></a>
-<a target="_blank" href="https://app.cyclic.sh/api/app/deploy/Thisisanalthowcool/Velocity"><img alt="Deploy to Cyclic" src="https://binbashbanana.github.io/deploy-buttons/buttons/remade/cyclic.svg"></a>
 
 ## Features
 
