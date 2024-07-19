@@ -1,8 +1,10 @@
 // @refresh reload
-import Bookmark from "./API/Bookmark";
+import { BookmarkTreeNode, getChildren } from "./addon/api/bookmarks";
 import "./browser.css";
 import SEO from "./components/SEO";
-import { Suspense, createEffect, onMount } from "solid-js";
+import { globalBindingUtil } from "./manager/addonWorkerManager";
+import { fs, sh } from "./util/fs";
+import { Suspense, onMount } from "solid-js";
 import type { JSX } from "solid-js";
 import {
   Body,
@@ -13,34 +15,55 @@ import {
   Routes,
   Scripts
 } from "solid-start";
-import {
-  bookmarks,
-  bookmarksShown,
-  setBookmarks,
-  setBookmarksShown,
-  tabs
-} from "~/data/appState";
+import { setBookmarks, setBookmarksShown } from "~/data/appState";
 import { defaultTheme, updateCssVariables } from "~/manager/themeManager";
 import { preferences } from "~/util/";
 
 export default function Root(): JSX.Element {
+  function headRef(head: HTMLHeadElement) {
+    const fontawesome = document.createElement("script");
+    fontawesome.src = "/pro.fontawesome.js";
+    head.appendChild(fontawesome);
+
+    const bundle = document.createElement("script");
+    bundle.charset = "UTF-8";
+    bundle.src = "/uv/uv.bundle.js";
+
+    bundle.onload = () => {
+      const config = document.createElement("script");
+      config.src = "/uv/uv.config.js";
+      head.appendChild(config);
+
+      const epoxy_script = document.createElement("script");
+      epoxy_script.src = "/epoxy/index.js";
+      head.appendChild(epoxy_script);
+
+      const baremux_script = document.createElement("script");
+      baremux_script.src = "/baremux/bare.cjs";
+      baremux_script.type = "text/javascript";
+      head.appendChild(baremux_script);
+
+
+      config.onload = () => {
+        import("~/util/registerSW");
+      };
+    };
+
+    head.appendChild(bundle);
+  }
+
   onMount(async () => {
-    ["/uv/uv.config.js", "/uv/uv.bundle.js"].forEach((_) => {
-      const s = document.createElement("script");
-      s.src = _;
-      document.head.appendChild(s);
-    });
     await updateTheme(localStorage.getItem("theme")!);
 
     window.addEventListener("storage", async (event: StorageEvent) => {
       if (event.key === "theme") await updateTheme(event.newValue!);
     });
 
-    setBookmarks(
-      JSON.parse(localStorage.getItem("bookmarks") || "[]").map(
-        (x: any) => new Bookmark(x)
-      )
-    );
+    setBookmarks(await getChildren("root________"));
+
+    globalBindingUtil.on("bookmarks.reload", async () => {
+      setBookmarks(await getChildren("root________"));
+    });
 
     setBookmarksShown((preferences()["bookmarks.shown"] as boolean) ?? true);
 
@@ -54,10 +77,7 @@ export default function Root(): JSX.Element {
 
   return (
     <Html lang="en">
-      <Head>
-        <script src="/pro.fontawesome.js" defer></script>
-        <script src="/uv/uv.bundle.js"></script>
-        <script src="/uv/uv.config.js"></script>
+      <Head ref={headRef}>
         <SEO />
       </Head>
       <Body class="h-screen">

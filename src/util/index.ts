@@ -1,4 +1,4 @@
-import type Tab from "~/API/Tab";
+import type Tab from "~/api/Tab";
 import { tabStack } from "~/data/appState";
 import type Preferences from "~/types/Preferences";
 
@@ -10,7 +10,7 @@ export function preferences(): Preferences {
         "general.tabs.openWindowLinksInTab": true,
         "general.tabs.switchToMedia": false,
         "general.tabs.confirmBeforeClosing": true,
-        "search.defaults.useHttps": false,
+        "search.defaults.useHttps": true,
         "search.defaults.searchEngine": "google",
         "search.defaults.proxy": "ultraviolet",
         "bookmarks.shown": true

@@ -1,32 +1,20 @@
 import Favicon from "./Favicon";
 import { createSignal } from "solid-js";
 import type { JSX } from "solid-js";
-import type BookmarkAPI from "~/API/Bookmark";
-import ContextItem from "~/API/ContextItem";
-import Tab from "~/API/Tab";
-import { open } from "~/manager/clickManager";
-import { getActiveTab } from "~/util";
+import { BookmarkTreeNode } from "~/addon/api/bookmarks";
+import ContextItem from "~/api/ContextItem";
+import { edit, removeNode, run } from "~/manager/bookmarkManager";
 
 interface BookmarkProps {
   sortable: any;
-  bookmark: BookmarkAPI;
+  bookmark: BookmarkTreeNode;
 }
 
 export default function Bookmark(props: BookmarkProps): JSX.Element {
   const { sortable, bookmark } = props;
 
   function handleClick(event: MouseEvent) {
-    if (/^javascript:/.test(bookmark.url)) {
-      getActiveTab().executeScript(
-        decodeURIComponent(bookmark.url.replace(/^javascript:/, ""))
-      );
-    } else {
-      if (event.ctrlKey) {
-        new Tab(bookmark.url, false);
-      } else {
-        getActiveTab().navigate(bookmark.url);
-      }
-    }
+    run(bookmark, event);
   }
 
   return (
@@ -34,22 +22,28 @@ export default function Bookmark(props: BookmarkProps): JSX.Element {
       // @ts-ignore
       use:sortable
       onClick={handleClick}
-      class="toolbarbutton-1 h-6 flex items-center gap-1 rounded cursor-default px-1 select-none"
+      class="toolbarbutton-1 flex h-6 cursor-default select-none items-center gap-1 rounded px-1"
       oncontextmenu={(event: MouseEvent & { data?: ContextItem[] }): void => {
         event.data = [
           new ContextItem({
             text: "Open in new tab",
-            onClick: () => {
-              open(event, bookmark.url, false, true);
+            onClick(e: MouseEvent) {
+              run(bookmark, e, true);
             }
           }),
           new ContextItem({
             separator: true
           }),
           new ContextItem({
-            text: "Delete",
+            text: "Edit Bookmark...",
             onClick: () => {
-              bookmark.delete();
+              edit(bookmark);
+            }
+          }),
+          new ContextItem({
+            text: "Delete Bookmark...",
+            onClick: () => {
+              removeNode(bookmark);
             }
           }),
           new ContextItem({
@@ -58,10 +52,14 @@ export default function Bookmark(props: BookmarkProps): JSX.Element {
         ];
       }}
     >
-      <div class="w-[15px] h-[15px]">
-        <Favicon src={createSignal<string>(bookmark.icon)[0]}></Favicon>
+      <div class="h-[15px] w-[15px]">
+        <Favicon
+          src={createSignal<string>(bookmark.icon || "/icons/earth.svg")[0]}
+        ></Favicon>
       </div>
-      {bookmark.name}
+      {bookmark.title.length > 20
+        ? bookmark.title.substring(0, 18) + "..."
+        : bookmark.title}
     </div>
   );
 }

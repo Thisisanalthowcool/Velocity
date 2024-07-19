@@ -1,5 +1,5 @@
 import type { JSX } from "solid-js";
-import type Keybind from "~/API/Keybind";
+import type Keybind from "~/api/Keybind";
 
 interface KeybindProps {
   value: Keybind;
@@ -11,7 +11,7 @@ export default function KeybindInput(props: KeybindProps): JSX.Element {
       <input
         value={props.value.toString()}
         type="text"
-        class="bg-[#2A2A32] rounded py-[7px] px-[15px]"
+        class="rounded bg-[#2A2A32] px-[15px] py-[7px]"
         onKeyDown={(event) => {
           event.preventDefault();
           event.stopImmediatePropagation();

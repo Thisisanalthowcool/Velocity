@@ -1,7 +1,7 @@
 import Button from "./Button";
 import { For, createSignal, onMount } from "solid-js";
 import type { JSX } from "solid-js";
-import type ContextItem from "~/API/ContextItem";
+import type ContextItem from "~/api/ContextItem";
 
 const [clientX, setClientX] = createSignal(0);
 const [clientY, setClientY] = createSignal(0);
@@ -81,9 +81,9 @@ export default function ContextMenu(): JSX.Element {
   return (
     <div
       id="context-menu"
-      class={`fixed ${
+      class={`popup fixed z-[99999999] ${
         visible() ? "display" : "hidden"
-      } w-48 bg-[#2B2A33] shadow-lg rounded border border-[#b5b5b5] py-1`}
+      } w-48 rounded border py-1`}
       style={`left: ${x()}px; top: ${y()}px;`}
       onContextMenu={cancelEvent}
       onClick={cancelEvent}
@@ -91,14 +91,14 @@ export default function ContextMenu(): JSX.Element {
       <For each={buttons()}>
         {(button: ContextItem): JSX.Element => {
           if (button.separator) {
-            return <hr class="border-[#b5b5b5] my-1" />;
+            return <hr class="mx-2 my-1" />;
           } else {
             return (
               <Button
                 text={button.text as string}
-                onClick={() => {
+                onClick={(e: MouseEvent) => {
                   setVisible(false);
-                  button.onClick!();
+                  button.onClick!(e);
                 }}
               />
             );

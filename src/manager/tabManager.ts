@@ -1,11 +1,10 @@
 import { registerTab } from "./runtimeManager";
-import type ContextItem from "~/API/ContextItem";
-import Tab from "~/API/Tab";
+import type ContextItem from "~/api/ContextItem";
+import Tab from "~/api/Tab";
 import { bindIFrameMousemove } from "~/components/ContextMenu";
 import handleClick from "~/manager/clickManager";
 import generateContextButtons from "~/manager/contextManager";
 import keybind from "~/manager/keybindManager";
-import xenosPostManifest from "~/manager/xenosManager";
 import * as urlUtil from "~/util/url";
 
 export function register(tab: Tab): void {
@@ -40,12 +39,15 @@ function registerEvents(tab: Tab): void {
   tab.iframe.contentWindow?.addEventListener(
     "contextmenu",
     (event: Event & { data?: ContextItem[] }) => {
-      if (event.target)
-        event.data = generateContextButtons(event.target as HTMLElement);
+      if (!event.defaultPrevented) {
+        if (event.target) {
+          event.data = generateContextButtons(event.target as HTMLElement);
+        }
+      }
     }
   );
   tab.iframe.contentWindow?.addEventListener("DOMContentLoaded", () => {
-    injectabtory(tab);
+    injectHistory(tab);
     tab.emit("document_end", normalizeURL(tab.url()));
   });
   tab.iframe.contentWindow?.addEventListener("load", async () => {
@@ -63,15 +65,6 @@ function registerEvents(tab: Tab): void {
         tab.historyId = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
       window.Velocity.history.add(tab);
     }
-    if ("xen" in window) {
-      const manifest =
-        tab.iframe.contentDocument?.querySelector<HTMLLinkElement>(
-          "link[rel='manifest']"
-        )?.href;
-      if (manifest) {
-        xenosPostManifest(manifest, tab.url());
-      }
-    }
   });
 
   (tab.iframe.contentWindow || ({} as { open: any })).open = (url: string) => {
@@ -85,7 +78,7 @@ function registerEvents(tab: Tab): void {
   bindIFrameMousemove(tab.iframe);
 }
 
-function injectabtory(tab: Tab): void {
+function injectHistory(tab: Tab): void {
   if (tab.iframe.contentWindow) {
     tab.iframe.contentWindow.history.pushState = new Proxy(
       tab.iframe.contentWindow.history.pushState,

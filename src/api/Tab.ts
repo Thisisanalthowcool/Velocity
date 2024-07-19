@@ -1,8 +1,8 @@
-import Bookmark from "./Bookmark";
 import EventEmitter from "events";
 import { createSignal } from "solid-js";
 import type { Accessor, Setter } from "solid-js";
 import { setTabStack, setTabs, tabStack, tabs } from "~/data/appState";
+import { createNode } from "~/manager/bookmarkManager";
 import * as contentScriptManager from "~/manager/contentScriptManager";
 import * as tabManager from "~/manager/tabManager";
 import { getActiveTab } from "~/util";
@@ -32,7 +32,7 @@ export default class Tab extends EventEmitter {
     super();
     contentScriptManager.subscribe(this);
     // initialize iframe
-    this.iframe.classList.add("w-full", "h-full", "border-0");
+    this.iframe.classList.add("w-full", "h-full", "border-0", "select-none");
     if (!isActive) this.iframe.classList.add("hidden");
     document
       .querySelector<HTMLDivElement>("#content")
@@ -40,6 +40,11 @@ export default class Tab extends EventEmitter {
     tabManager.register(this);
     this.navigate(url || "about:newTab");
     requestAnimationFrame(this.#updateDetails.bind(this));
+
+    if ((!url || url === "about:newTab") && (isActive ?? true)) {
+      document.querySelector<HTMLInputElement>("#url_bar")?.focus();
+      this.search = "";
+    }
 
     // Add tab to stack
     setTabs([...tabs(), this]);
@@ -71,6 +76,9 @@ export default class Tab extends EventEmitter {
   }
 
   navigate(query: string) {
+    this.emit("navigate", query);
+
+    this.iframe.title = query;
     let url = urlUtil.generateProxyUrl(query);
 
     this.iframe.onload = () => {
@@ -83,6 +91,8 @@ export default class Tab extends EventEmitter {
   }
 
   close(event?: MouseEvent): void {
+    this.emit("closed");
+
     if (event) {
       event.stopPropagation();
     }
@@ -97,10 +107,11 @@ export default class Tab extends EventEmitter {
   }
 
   bookmark() {
-    new Bookmark({
-      name: this.#title[0](),
-      url: this.#url[0](),
-      icon: this.#icon[0]()
+    createNode({
+      type: "bookmark",
+      title: this.title(),
+      url: this.url() || "about:newTab",
+      icon: this.icon()
     });
   }
 

@@ -1,7 +1,7 @@
-import AddonReader from "~/API/AddonReader";
-import RuntimeModifier from "~/API/RuntimeModifier";
+import AddonReader from "~/api/AddonReader";
+import RuntimeModifier from "~/api/RuntimeModifier";
 import { addons } from "~/data/appState";
-import { install, uninstall } from "~/manager/addonManager";
+import { install, uninstall } from "~/manager/addonStateManager";
 
 const addonStoreModifier = new RuntimeModifier("addonstore");
 
@@ -62,6 +62,7 @@ class AddonManager extends EventTarget {
                 .catch(() => {});
             },
             setEnabled: (state: boolean) => {
+              // TODO: implement state toggles
               if (state) {
                 this.dispatchEvent(new AddonEvent("onEnabling", id));
                 setTimeout(() => {

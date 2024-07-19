@@ -1,9 +1,9 @@
 import Color from "color";
-import mimeDB from "mime-db";
+import mime from "mime-types";
 import { isServer } from "solid-js/web";
 import type Manifest from "webextension-manifest";
 import type { Theme } from "webextension-manifest";
-import type AddonReader from "~/API/AddonReader";
+import type AddonReader from "~/api/AddonReader";
 
 export const defaultTheme = {
   colors: {
@@ -35,8 +35,20 @@ export async function updateCssVariables(theme: Theme, reader?: AddonReader) {
   root.setAttribute("style", "");
 
   for (let rule in theme.colors) {
-    if (rule === "accentcolor") rule = "frame";
-    if (rule === "textcolor") rule = "tab_background_text";
+    if (rule === "accentcolor") {
+      rule = "frame";
+      console.warn(
+        "Using accentcolor in themes is deprecated since Firefox 70."
+      );
+    }
+    if (rule === "textcolor") {
+      rule = "tab_background_text";
+      console.warn(
+        "Using tab_background_text in themes is deprecated since Firefox 70."
+      );
+    }
+    // https://searchfox.org/mozilla-central/rev/31f5847a4494b3646edabbdd7ea39cb88509afe2/toolkit/components/extensions/schemas/theme.json#154
+    if (rule === "bookmark_text") rule = "toolbar_text";
 
     const cssRule = `--${rule.replace(/_/g, "-")}`;
     root.style.setProperty(
@@ -83,20 +95,7 @@ export async function updateCssVariables(theme: Theme, reader?: AddonReader) {
 }
 
 async function extractBlob(url: string, reader: AddonReader): Promise<Blob> {
-  const blob = await reader.extractFile(url, getMime(url));
+  const blob = await reader.extractFile(url, mime.lookup(url) || "text/plain");
   if (typeof blob === "string") throw new Error("Unable to extract file.");
   return blob!;
-}
-
-function getMime(file: string): string {
-  const extension = file.split(/\./i).at(-1) || "txt";
-  for (const mime in mimeDB) {
-    if (
-      mimeDB[mime].extensions &&
-      mimeDB[mime].extensions?.includes(extension)
-    ) {
-      return mime;
-    }
-  }
-  return "text/plain";
 }

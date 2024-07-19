@@ -7,10 +7,10 @@ import {
   closestCenter,
   createSortable
 } from "@thisbeyond/solid-dnd";
-import { For, Show } from "solid-js";
 import type { JSX } from "solid-js";
-import type BookmarkAPI from "~/API/Bookmark";
-import ContextItem from "~/API/ContextItem";
+import { For, Show } from "solid-js";
+import { BookmarkTreeNode, move } from "~/addon/api/bookmarks";
+import ContextItem from "~/api/ContextItem";
 import { bookmarks, setBookmarks } from "~/data/appState";
 import { bookmarksShown, setBookmarksShown } from "~/data/appState";
 
@@ -21,13 +21,16 @@ export default function Bookmarks(): JSX.Element {
     if (draggable && droppable) {
       const currentItems = bookmarks();
       const fromIndex = currentItems.findIndex(
-        (bookmark: BookmarkAPI) => bookmark.id === draggable.id
+        (bookmark: BookmarkTreeNode) => bookmark.id === draggable.id
       );
       const toIndex = currentItems.findIndex(
-        (bookmark: BookmarkAPI) => bookmark.id === droppable.id
+        (bookmark: BookmarkTreeNode) => bookmark.id === droppable.id
       );
       if (fromIndex !== toIndex) {
         const updatedItems = currentItems.slice();
+        move(draggable.id, {
+          index: toIndex
+        });
         updatedItems.splice(toIndex, 0, ...updatedItems.splice(fromIndex, 1));
         setBookmarks(updatedItems);
       }
@@ -42,7 +45,7 @@ export default function Bookmarks(): JSX.Element {
     <Show when={bookmarksShown()}>
       <div
         id="PersonalToolbar"
-        class="flex items-center h-7 w-full text-[11px] px-2 gap-2"
+        class="flex h-7 w-full items-center gap-2 px-2 text-[11px]"
         oncontextmenu={(event: MouseEvent & { data?: ContextItem[] }): void => {
           if (!event.data) event.data = [];
           event.data.push(
@@ -64,7 +67,7 @@ export default function Bookmarks(): JSX.Element {
           <DragDropSensors />
           <SortableProvider ids={bookmarks().map((x) => x.id)}>
             <For each={bookmarks()}>
-              {(bookmark: BookmarkAPI) => {
+              {(bookmark: BookmarkTreeNode) => {
                 const sortable = createSortable(bookmark.id);
                 return <Bookmark sortable={sortable} bookmark={bookmark} />;
               }}
